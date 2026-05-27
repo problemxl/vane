@@ -1,0 +1,58 @@
+# ── Vane production stack ────────────────────────────────────────────
+# Start:  docker compose up -d
+# Stop:   docker compose down
+# Logs:   docker compose logs -f vane
+#
+# Secrets flow:
+#   Infisical bootstrap env vars → SDK authenticates → fetches app
+#   secrets (keys, tokens, DB password) → injected as env vars.
+#   No secrets in this file. No .env file in the container.
+
+services:
+  vane:
+    build: .
+    container_name: vane
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      # ── Infisical bootstrap (identity only — no app secrets) ──
+      - INFISICAL_ENABLED=true
+      - INFISICAL_CLIENT_ID=${INFISICAL_CLIENT_ID}
+      - INFISICAL_CLIENT_SECRET=${INFISICAL_CLIENT_SECRET}
+      - INFISICAL_PROJECT_ID=${INFISICAL_PROJECT_ID}
+      - INFISICAL_ENV=production
+      # ── App config (non-secret) ─────────────────────────────
+      # DATABASE_URL is fetched from Infisical (includes password)
+      # For local dev without Infisical, set DATABASE_URL in .env
+    volumes:
+      - vane_data:/app/data
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  db:
+    image: postgres:16-alpine
+    container_name: vane-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=vane
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-vane}
+      - POSTGRES_DB=vane
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vane"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  pg_data:
+  vane_data:

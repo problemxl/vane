@@ -1,0 +1,50 @@
+# Python
+__pycache__
+*.py[cod]
+*.egg-info
+dist
+.mypy_cache
+.ruff_cache
+.pytest_cache
+
+# Virtual environment
+.venv
+venv
+
+# Environment files (secrets)
+.env
+.env.*
+!.env.example
+!env.production.example
+
+# Database files (SQLite)
+data/*.db
+data/*.db-journal
+data/*.db-wal
+
+# Logs
+logs/
+*.log
+
+# Git
+.git
+.gitignore
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml
+
+# Tests
+tests/
+htmlcov/
+.coverage*
+coverage.xml

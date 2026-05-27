@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+
+# Environment & secrets (EVERYTHING sensitive)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Database
+data/*.db
+data/*.sqlite
+
+# Logs
+logs/
+*.log
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker data
+pgdata/
+
+# Alembic (only the generated migration files are committed)
+alembic/versions/__pycache__/
