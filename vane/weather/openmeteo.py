@@ -80,8 +80,7 @@ class OpenMeteoClient:
 
         # Fetch forecasts from each ensemble model in parallel
         tasks = [
-            self._fetch_model(lat, lon, target_date, model)
-            for model in settings.ensemble_models
+            self._fetch_model(lat, lon, target_date, model) for model in settings.ensemble_models
         ]
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
@@ -94,11 +93,15 @@ class OpenMeteoClient:
                 model_raw.append({"model": model, "temp_high": result})
 
         if len(model_predictions) < 3:
-            logger.warning("Insufficient ensemble data for %s (got %d models)", city, len(model_predictions))
+            logger.warning(
+                "Insufficient ensemble data for %s (got %d models)", city, len(model_predictions)
+            )
             return None
 
         ensemble_mean = sum(model_predictions) / len(model_predictions)
-        ensemble_std = (sum((x - ensemble_mean) ** 2 for x in model_predictions) / len(model_predictions)) ** 0.5
+        ensemble_std = (
+            sum((x - ensemble_mean) ** 2 for x in model_predictions) / len(model_predictions)
+        ) ** 0.5
 
         return {
             "city": city,

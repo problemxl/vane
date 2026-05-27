@@ -21,9 +21,7 @@ async def get_signals(
     db: AsyncSession = Depends(get_db),
 ) -> dict[str, Any]:
     """Get recent signals from the database."""
-    result = await db.execute(
-        select(Signal).order_by(desc(Signal.created_at)).limit(limit)
-    )
+    result = await db.execute(select(Signal).order_by(desc(Signal.created_at)).limit(limit))
     signals = result.scalars().all()
 
     return {

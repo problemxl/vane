@@ -2,9 +2,9 @@ from __future__ import annotations
 
 """Initial migration: create trades, signals, and weather_forecasts tables."""
 
-from alembic import op
 import sqlalchemy as sa
 
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = "001"
@@ -92,7 +92,9 @@ def upgrade() -> None:
         sqlite_autoincrement=True,
     )
     op.create_index("ix_weather_forecasts_city", "weather_forecasts", ["city"], unique=False)
-    op.create_index("ix_weather_forecasts_forecast_date", "weather_forecasts", ["forecast_date"], unique=False)
+    op.create_index(
+        "ix_weather_forecasts_forecast_date", "weather_forecasts", ["forecast_date"], unique=False
+    )
 
 
 def downgrade() -> None:

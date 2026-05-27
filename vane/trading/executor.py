@@ -47,7 +47,10 @@ class TradeExecutor:
             return ExecutionResult(False, error="Max daily trades reached")
         if self._daily_pnl <= -settings.max_daily_loss_usd:
             return ExecutionResult(False, error="Daily loss limit reached")
-        if not signal.suggested_size_usd or signal.suggested_size_usd < settings.min_position_size_usd:
+        if (
+            not signal.suggested_size_usd
+            or signal.suggested_size_usd < settings.min_position_size_usd
+        ):
             return ExecutionResult(False, error="Position size too small")
 
         # Persist signal
@@ -119,14 +122,21 @@ class TradeExecutor:
 
     async def _paper_execute(self, signal: TradingSignal) -> ExecutionResult:
         """Simulate a fill with slippage."""
-        trade_id = f"paper-{signal.city}-{signal.date}-{signal.direction}-{datetime.datetime.utcnow().timestamp()}"
+        trade_id = (
+            f"paper-{signal.city}-{signal.date}-{signal.direction}"
+            f"-{datetime.datetime.utcnow().timestamp()}"
+        )
         slippage = 0.005  # 0.5% simulated slippage
         filled_price = signal.market_price + (slippage if signal.direction == "YES" else -slippage)
         filled_price = max(0.01, min(0.99, filled_price))
 
         logger.info(
             "PAPER trade: %s %s %s at %.4f (size: $%.2f)",
-            signal.direction, signal.city, signal.bin_label, filled_price, signal.suggested_size_usd,
+            signal.direction,
+            signal.city,
+            signal.bin_label,
+            filled_price,
+            signal.suggested_size_usd,
         )
         return ExecutionResult(
             success=True,
@@ -155,7 +165,10 @@ class TradeExecutor:
             if result.get("ok"):
                 logger.info(
                     "LIVE trade: %s %s at %.4f (order: %s)",
-                    signal.direction, signal.city, limit_price, result.get("order_id"),
+                    signal.direction,
+                    signal.city,
+                    limit_price,
+                    result.get("order_id"),
                 )
                 return ExecutionResult(
                     success=True,

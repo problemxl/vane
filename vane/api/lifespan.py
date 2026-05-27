@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 from contextlib import asynccontextmanager
-from pathlib import Path
 from typing import Any
 
 from fastapi import FastAPI
@@ -76,9 +75,7 @@ class LifespanManager:
                     result.stderr.strip()[:200] if result.stderr else "no output",
                 )
         except Exception as exc:
-            logger.warning(
-                "Database migration skipped (non-fatal): %s", exc
-            )
+            logger.warning("Database migration skipped (non-fatal): %s", exc)
 
     @property
     def scheduler_status(self) -> dict[str, Any]:

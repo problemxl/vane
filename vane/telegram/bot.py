@@ -34,11 +34,7 @@ class TelegramBot:
         if not settings.telegram_bot_token:
             raise RuntimeError("TELEGRAM_BOT_TOKEN not set")
 
-        self._app = (
-            Application.builder()
-            .token(settings.telegram_bot_token)
-            .build()
-        )
+        self._app = Application.builder().token(settings.telegram_bot_token).build()
 
         # Register handlers
         self._app.add_handler(CommandHandler("start", self._cmd_start))
@@ -121,12 +117,14 @@ class TelegramBot:
                 [InlineKeyboardButton("🔄 Refresh", callback_data="refresh")],
             ]
             if signals:
-                keyboard.append([
-                    InlineKeyboardButton(
-                        f"Trade {signals[0].city.title()}",
-                        callback_data=f"trade:{signals[0].market_id}:{signals[0].token_id}:{signals[0].direction}",
-                    )
-                ])
+                keyboard.append(
+                    [
+                        InlineKeyboardButton(
+                            f"Trade {signals[0].city.title()}",
+                            callback_data=f"trade:{signals[0].market_id}:{signals[0].token_id}:{signals[0].direction}",
+                        )
+                    ]
+                )
 
             await update.message.reply_text(
                 text,
@@ -140,6 +138,7 @@ class TelegramBot:
     async def _cmd_signals(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         async with AsyncSessionLocal() as session:
             from sqlalchemy import desc, select
+
             result = await session.execute(
                 select(Signal).order_by(desc(Signal.created_at)).limit(10)
             )
@@ -205,9 +204,8 @@ class TelegramBot:
     async def _cmd_trades(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         async with AsyncSessionLocal() as session:
             from sqlalchemy import desc, select
-            result = await session.execute(
-                select(Trade).order_by(desc(Trade.created_at)).limit(10)
-            )
+
+            result = await session.execute(select(Trade).order_by(desc(Trade.created_at)).limit(10))
             trades = result.scalars().all()
 
             if not trades:
@@ -216,7 +214,9 @@ class TelegramBot:
 
             text = "📝 *Recent Trades*\n\n"
             for t in trades:
-                status_emoji = "✅" if t.status == "FILLED" else "❌" if t.status == "FAILED" else "⏳"
+                status_emoji = (
+                    "✅" if t.status == "FILLED" else "❌" if t.status == "FAILED" else "⏳"
+                )
                 text += (
                     f"{status_emoji} *{t.city}* {t.bin_label or ''}\n"
                     f"   `{t.direction}` @ `{float(t.filled_price or t.entry_price or 0):.4f}`\n"

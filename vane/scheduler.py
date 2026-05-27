@@ -124,7 +124,11 @@ class SchedulerManager:
                     result.success,
                 )
             else:
-                logger.info("Trade scan: %d signals, trading_enabled=%s", len(signals), settings.trading_enabled)
+                logger.info(
+                    "Trade scan: %d signals, trading_enabled=%s",
+                    len(signals),
+                    settings.trading_enabled,
+                )
         except Exception as exc:
             logger.error("Trade scan error: %s", exc)
 

@@ -76,12 +76,10 @@ class PolymarketClient:
             return {
                 "token_id": token_id,
                 "bids": [
-                    {"price": float(b.price), "size": float(b.size)}
-                    for b in (book.bids or [])
+                    {"price": float(b.price), "size": float(b.size)} for b in (book.bids or [])
                 ],
                 "asks": [
-                    {"price": float(a.price), "size": float(a.size)}
-                    for a in (book.asks or [])
+                    {"price": float(a.price), "size": float(a.size)} for a in (book.asks or [])
                 ],
             }
         except Exception as exc:
@@ -193,13 +191,15 @@ class PolymarketClient:
         )
         async for page in paginator:
             for pos in page.items:
-                positions.append({
-                    "token_id": pos.token_id,
-                    "market_id": pos.market_id,
-                    "size": float(pos.size) if pos.size else 0.0,
-                    "avg_price": float(pos.avg_price) if pos.avg_price else 0.0,
-                    "unrealized_pnl": float(pos.unrealized_pnl) if pos.unrealized_pnl else 0.0,
-                })
+                positions.append(
+                    {
+                        "token_id": pos.token_id,
+                        "market_id": pos.market_id,
+                        "size": float(pos.size) if pos.size else 0.0,
+                        "avg_price": float(pos.avg_price) if pos.avg_price else 0.0,
+                        "unrealized_pnl": float(pos.unrealized_pnl) if pos.unrealized_pnl else 0.0,
+                    }
+                )
         return positions
 
     async def list_open_orders(self, token_id: str | None = None) -> list[dict[str, Any]]:
@@ -214,15 +214,17 @@ class PolymarketClient:
         )
         async for page in paginator:
             for order in page.items:
-                orders.append({
-                    "order_id": order.id,
-                    "token_id": order.token_id,
-                    "side": order.side,
-                    "price": float(order.price) if order.price else 0.0,
-                    "size": float(order.size) if order.size else 0.0,
-                    "status": order.status,
-                    "created_at": str(order.created_at) if order.created_at else None,
-                })
+                orders.append(
+                    {
+                        "order_id": order.id,
+                        "token_id": order.token_id,
+                        "side": order.side,
+                        "price": float(order.price) if order.price else 0.0,
+                        "size": float(order.size) if order.size else 0.0,
+                        "status": order.status,
+                        "created_at": str(order.created_at) if order.created_at else None,
+                    }
+                )
         return orders
 
     # ── Helpers ─────────────────────────────────────────────────
@@ -234,21 +236,39 @@ class PolymarketClient:
             "condition_id": market.condition_id,
             "title": getattr(market, "title", None) or getattr(market, "question", None),
             "description": getattr(market, "description", None),
-            "start_date": str(market.state.start_date) if market.state and market.state.start_date else None,
-            "end_date": str(market.state.end_date) if market.state and market.state.end_date else None,
+            "start_date": str(market.state.start_date)
+            if market.state and market.state.start_date
+            else None,
+            "end_date": str(market.state.end_date)
+            if market.state and market.state.end_date
+            else None,
             "active": getattr(market, "active", None),
             "closed": getattr(market, "closed", None),
-            "tags": [t.label if hasattr(t, "label") else str(t) for t in getattr(market, "tags", [])],
+            "tags": [
+                t.label if hasattr(t, "label") else str(t) for t in getattr(market, "tags", [])
+            ],
             "outcomes": {
                 "yes": {
-                    "token_id": market.outcomes.yes.token_id if market.outcomes and market.outcomes.yes else None,
-                    "price": float(market.outcomes.yes.price) if market.outcomes and market.outcomes.yes and market.outcomes.yes.price else None,
-                    "label": getattr(market.outcomes.yes, "label", "Yes") if market.outcomes and market.outcomes.yes else None,
+                    "token_id": market.outcomes.yes.token_id
+                    if market.outcomes and market.outcomes.yes
+                    else None,
+                    "price": float(market.outcomes.yes.price)
+                    if market.outcomes and market.outcomes.yes and market.outcomes.yes.price
+                    else None,
+                    "label": getattr(market.outcomes.yes, "label", "Yes")
+                    if market.outcomes and market.outcomes.yes
+                    else None,
                 },
                 "no": {
-                    "token_id": market.outcomes.no.token_id if market.outcomes and market.outcomes.no else None,
-                    "price": float(market.outcomes.no.price) if market.outcomes and market.outcomes.no and market.outcomes.no.price else None,
-                    "label": getattr(market.outcomes.no, "label", "No") if market.outcomes and market.outcomes.no else None,
+                    "token_id": market.outcomes.no.token_id
+                    if market.outcomes and market.outcomes.no
+                    else None,
+                    "price": float(market.outcomes.no.price)
+                    if market.outcomes and market.outcomes.no and market.outcomes.no.price
+                    else None,
+                    "label": getattr(market.outcomes.no, "label", "No")
+                    if market.outcomes and market.outcomes.no
+                    else None,
                 },
             },
             "volume": float(getattr(market, "volume", 0) or 0),
@@ -259,5 +279,14 @@ class PolymarketClient:
         """Heuristic: is this a weather market?"""
         title = (market_dict.get("title") or "").lower()
         desc = (market_dict.get("description") or "").lower()
-        keywords = ["temperature", "high temp", "low temp", "rain", "snow", "weather", "°f", "celsius"]
+        keywords = [
+            "temperature",
+            "high temp",
+            "low temp",
+            "rain",
+            "snow",
+            "weather",
+            "°f",
+            "celsius",
+        ]
         return any(kw in title or kw in desc for kw in keywords)

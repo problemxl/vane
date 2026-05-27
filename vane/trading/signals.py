@@ -91,9 +91,7 @@ class SignalGenerator:
             return None
 
         # Compute probability of being in bucket
-        our_prob = await self._weather.compute_probability(
-            forecast, bucket["low"], bucket["high"]
-        )
+        our_prob = await self._weather.compute_probability(forecast, bucket["low"], bucket["high"])
         our_prob = float(our_prob)
 
         # Get market price
@@ -145,6 +143,7 @@ class SignalGenerator:
         """Extract city name from market title."""
         lower = title.lower()
         from vane.weather.openmeteo import CITY_STATIONS
+
         for city in sorted(CITY_STATIONS.keys(), key=len, reverse=True):
             if city in lower:
                 return city

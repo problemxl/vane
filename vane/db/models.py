@@ -48,7 +48,9 @@ class Trade(Base):
     direction: Mapped[str] = mapped_column(String(8))  # YES or NO
     side: Mapped[str] = mapped_column(String(8))  # BUY or SELL
     order_type: Mapped[str] = mapped_column(String(16))  # LIMIT, MARKET
-    status: Mapped[str] = mapped_column(String(32), default="PENDING")  # PENDING, OPEN, FILLED, CANCELLED, FAILED
+    status: Mapped[str] = mapped_column(
+        String(32), default="PENDING"
+    )  # PENDING, OPEN, FILLED, CANCELLED, FAILED
     mode: Mapped[str] = mapped_column(String(16), default="paper")  # paper or live
 
     # Pricing
